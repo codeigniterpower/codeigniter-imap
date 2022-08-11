@@ -28,7 +28,7 @@ class Imap
 	/**
 	 * IMAP stream
 	 *
-	 * @var resource
+	 * @var resource or IMAP\Connection
 	 */
 	protected $stream;
 
@@ -118,7 +118,10 @@ class Imap
 
 		//show_error($this->get_last_error());
 
-		return is_resource($this->stream);
+		if ($this->stream  !== false)
+			return TRUE;
+		else
+			return FALSE;
 	}
 
 	protected function set_cache($cache_id, $data)
@@ -198,7 +201,7 @@ class Imap
 	 */
 	public function disconnect()
 	{
-		if (is_resource($this->stream))
+		if (is_resource($this->stream) || $this->stream instanceof \IMAP\Connection)
 		{
 			if ($this->config['expunge_on_disconnect'] === true)
 			{
@@ -210,8 +213,8 @@ class Imap
 			// Clears all errors before to close
 			// See: https://github.com/natanfelles/codeigniter-imap/issues/5#issuecomment-355453233
 			imap_errors();
-
-			return imap_close($this->stream);
+			if (imap_ping(($this->stream))
+				return imap_close($this->stream);
 		}
 
 		return true;
@@ -1479,10 +1482,11 @@ class Imap
 	{
 		// TODO: Maybe is not necessary auto-close everytime
 		// Analyze it
-		if (is_resource($this->stream))
+		if (is_resource($this->stream) || $this->stream instanceof \IMAP\Connection)
 		{
 			imap_errors();
-			imap_close($this->stream);
+			if (imap_ping(($this->stream))
+				imap_close($this->stream);
 		}
 	}
 
