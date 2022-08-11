@@ -1,14 +1,14 @@
 <?php
 defined('BASEPATH') || exit('No direct script access allowed');
 
-$config['encrypto'] = 'tls';
-$config['validate'] = true;
-$config['host']     = 'domain.tld';
-$config['port']     = 143;
-$config['username'] = 'user@domain.tld';
-$config['password'] = 'password';
+$config['imap_secu'] = 'tls';
+$config['imap_cert'] = true;
+$config['imap_host'] = 'domain.tld';
+$config['imap_port'] = 143;
+$config['imap_user'] = NULL;
+$config['imap_pass'] = NULL;
 
-$config['folders'] = [
+$config['imap_folders'] = [
 	'inbox'  => 'INBOX',
 	'sent'   => 'Sent',
 	'trash'  => 'Trash',
@@ -18,7 +18,7 @@ $config['folders'] = [
 
 $config['expunge_on_disconnect'] = false;
 
-$config['cache'] = [
+$config['imap_cache'] = [
 	'active'     => false,
 	'adapter'    => 'file',
 	'backup'     => 'file',

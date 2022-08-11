@@ -7,7 +7,7 @@
  * @subpackage Libraries
  * @category   Email
  * @version    1.0.0-dev
- * @author     Natan Felles
+ * @author     Natan Felles, PICCORO Lenz McKAY
  * @link       http://github.com/natanfelles/codeigniter-imap
  */
 
