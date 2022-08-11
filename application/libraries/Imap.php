@@ -152,10 +152,12 @@ class Imap
 	 *
 	 * @return boolean
 	 */
-	public function set_timeout(int $timeout = 60, string $type = 'open')
+	public function set_timeout(int $timeout = NULL, string $type = NULL)
 	{
+		if($timeout == NULL) $timeout = 60;
+		if($type == NULL) $type = 'open';
 		$types = [
-			'open'  => IMAP_OPENTIMEOUT,
+			'open'  => IMAP_OPENTIMEOUT-20,
 			'read'  => IMAP_READTIMEOUT,
 			'write' => IMAP_WRITETIMEOUT,
 			'close' => IMAP_CLOSETIMEOUT,
@@ -171,10 +173,11 @@ class Imap
 	 *
 	 * @return integer
 	 */
-	public function get_timeout(string $type = 'open')
+	public function get_timeout(string $type = NULL)
 	{
+		if($type == NULL) $type = 'open';
 		$types = [
-			'open'  => IMAP_OPENTIMEOUT,
+			'open'  => IMAP_OPENTIMEOUT-20,
 			'read'  => IMAP_READTIMEOUT,
 			'write' => IMAP_WRITETIMEOUT,
 			'close' => IMAP_CLOSETIMEOUT,
@@ -231,8 +234,9 @@ class Imap
 	 *
 	 * @return Imap
 	 */
-	public function set_expunge_on_disconnect(bool $active = true)
+	public function set_expunge_on_disconnect(bool $active = NULL)
 	{
+		if ($active == NULL) $active = true;
 		$this->config['expunge_on_disconnect'] = $active;
 
 		return $this;
@@ -711,8 +715,9 @@ class Imap
 	 *
 	 * @return array|boolean False if attachment could not be get
 	 */
-	public function get_attachment(int $uid, int $index = 0)
+	public function get_attachment(int $uid, int $index = NULL)
 	{
+		if ($index == NULL) $index = 0;
 		$cache_id = $this->folder . ':message_' . $uid . ':attachment_' . $index;
 
 		if (($cache = $this->get_cache($cache_id)) !== false)
@@ -765,10 +770,11 @@ class Imap
 	 *
 	 * @return array
 	 */
-	protected function _get_attachments(int $uid, $structure, string $part_number = '',	int $index = null)
+	protected function _get_attachments(int $uid, $structure, string $part_number = NULL,	int $index = null)
 	{
 		$id          = imap_msgno($this->stream, $uid);
 		$attachments = [];
+		if ( $part_number == NULL) $part_number = '';
 
 		if (isset($structure->parts))
 		{
@@ -841,8 +847,9 @@ class Imap
 	 *
 	 * @return string
 	 */
-	protected function struc_decoding(string $text, int $encoding = 5)
+	protected function struc_decoding(string $text, int $encoding = NULL)
 	{
+		if ($encoding == NULL) $encoding = 5;
 		switch ($encoding)
 		{
 			case ENC7BIT: // 0 7bit
@@ -1092,8 +1099,11 @@ class Imap
 	 *
 	 * @return array
 	 */
-	public function paginate(array $uids, int $page = 1, int $per_page = 10)
+	public function paginate(array $uids, int $page = NULL, int $per_page = NULL)
 	{
+		if ($page == NULL) $page = 1;
+		if ($per_page == NULL) $per_page = 10;
+
 		if (count($uids) < $per_page * $page)
 		{
 			return [];
@@ -1169,8 +1179,12 @@ class Imap
 	 *
 	 * @return array Array of uid's matching the search criteria
 	 */
-	public function search(string $search_criteria = 'ALL', string $sort_by = 'date', bool $descending = true)
+	public function search(string $search_criteria = NULL, string $sort_by = NULL, bool $descending = NULL)
 	{
+		if ($search_criteria == NULL) $search_criteria = 'ALL';
+		if ($sort_by == NULL) $sort_by = 'date';
+		if ($descending == NULL) $descending = true;
+
 		$search_criteria = $this->search_criteria . ' ' . $search_criteria;
 
 		$this->search_criteria = '';
