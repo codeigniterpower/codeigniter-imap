@@ -105,7 +105,7 @@ class Imap
 
 		if (isset($config['encrypto']))
 		{
-			$enc .= '/imap/' . . $config['encrypto'];
+			$enc .= '/imap/' . $config['encrypto'];
 		}
 
 		if (isset($config['validate']) && $config['validate'] === false)
@@ -114,7 +114,7 @@ class Imap
 		}
 
 		$this->mailbox = '{' . $config['host'] . $enc . '}';
-		$this->stream  = imap_open($this->mailbox, $config['username'], $config['password']);
+		$this->stream  = imap_open($this->mailbox, $config['username'], $config['password'],NULL, 1, array('DISABLE_AUTHENTICATOR' => 'GSSAPI'));
 
 		//show_error($this->get_last_error());
 
@@ -191,7 +191,11 @@ class Imap
 	public function ping()
 	{
 		//return $this->fun('ping');
-		return imap_ping($this->stream);
+		if (is_resource($this->stream) || $this->stream instanceof \IMAP\Connection)
+		{
+			imap_errors();
+			return imap_ping($this->stream);
+		}
 	}
 
 	/**
@@ -213,7 +217,7 @@ class Imap
 			// Clears all errors before to close
 			// See: https://github.com/natanfelles/codeigniter-imap/issues/5#issuecomment-355453233
 			imap_errors();
-			if (imap_ping(($this->stream))
+			if (imap_ping($this->stream))
 				return imap_close($this->stream);
 		}
 
@@ -1485,7 +1489,7 @@ class Imap
 		if (is_resource($this->stream) || $this->stream instanceof \IMAP\Connection)
 		{
 			imap_errors();
-			if (imap_ping(($this->stream))
+			if (imap_ping($this->stream))
 				imap_close($this->stream);
 		}
 	}
