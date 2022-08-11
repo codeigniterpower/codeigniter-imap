@@ -638,7 +638,7 @@ class Imap
 			$uids = implode(',', $uids);
 		}
 
-		return imap_clearflag_full($this->stream, str_replace(' ', '', $uids), '\\' . ucfirst($flag), ST_UID);
+		return imap_clearflag_full($this->stream, str_replace(' ', '', $uids), "\\" . ucfirst($flag), ST_UID);
 	}
 
 	/**
@@ -1434,6 +1434,43 @@ class Imap
 
 		return 'TEXT/PLAIN';
 	}
+
+	/**
+	 * get single uid by message number 
+	 *
+	 * @param int $msg_number
+	 *
+	 * @return string
+	 */
+	public function getuid(int $msg_number) {
+		$uid = imap_uid ($this->stream, $msg_number);
+		return $uid;
+	}
+
+	/**
+	 * get all uids by folder of mails
+	 *
+	 * @param string $folder
+	 * @param string $flag_criteria
+	 *
+	 * @return array
+	 */
+	public function getuids(string $folder = null, string $flag_criteria = null) {
+
+		$total = $this->count_messages($folder, $flag_criteria);
+		$uids = [];
+		if ($total !== 0) {
+
+			for ($xindex = 1; $xindex <= $total; $xindex++) {
+				$uid = imap_uid ($this->stream, $xindex);
+				array_push($uids, $uid);
+			  }
+		} 
+
+		return $uids;
+
+	}
+
 
 	/**
 	 * [__destruct description]
