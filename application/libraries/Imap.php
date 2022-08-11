@@ -71,7 +71,7 @@ class Imap
 
 		if (! empty($config))
 		{
-			$this->config = $config;
+			$this->config = array_replace_recursive($this->config, $config);
 			//$this->connect();
 		}
 	}
@@ -86,7 +86,7 @@ class Imap
 		$config       = array_replace_recursive($this->config, $config);
 		$this->config = $config;
 
-		if ($config['cache']['active'] === true)
+		if (isset($config['cache']) && $config['cache']['active'] === true)
 		{
 			$this->CI->load->driver('cache',
 				[
