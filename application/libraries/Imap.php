@@ -113,8 +113,14 @@ class Imap
 			$enc .= '/novalidate-cert';
 		}
 
+		$options = array();
+		if (isset($config['plain']) && $config['plain'] === TRUE)
+		{
+			$options = array('DISABLE_AUTHENTICATOR' => 'GSSAPI','DISABLE_AUTHENTICATOR' => 'CRAM-MD5');
+		}
+
 		$this->mailbox = '{' . $config['host'] . $enc . '}';
-		$this->stream  = imap_open($this->mailbox, $config['username'], $config['password'],NULL, 1, array('DISABLE_AUTHENTICATOR' => 'GSSAPI'));
+		$this->stream  = imap_open($this->mailbox, $config['username'], $config['password'], 0, 0, $options);
 
 		//show_error($this->get_last_error());
 
