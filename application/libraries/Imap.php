@@ -68,27 +68,39 @@ class Imap
 	public function __construct(array $config = [])
 	{
 		$this->CI =& get_instance();
-
-		if (! empty($config))
-		{
-			$this->config = array_replace_recursive($this->config, $config);
-			//$this->connect();
-		}
+		$this->initialize($config);
 	}
 
 	/**
-	 * @param array $config Options: host, encrypto, user, pass, port, folders
+	 * [initialize description]
 	 *
-	 * @return boolean True if is connected
+	 * @param array $config Options: host, encrypto, user, pass, port, folders, etc..
+	 *
+	 * @return array $config configuration array
 	 */
-	public function connect(array $config = [])
+	public function initialize(array $newconfig = [])
 	{
-		$config       = array_replace_recursive($this->config, $config);
-		$this->config = $config;
+		$this->CI->config->load('imap');
+		$baseconfig = array(
+		    'host'     => config_item('imap_host'),
+		    'port'     => config_item('imap_port'),
+		    'encrypto' => config_item('imap_secu'),
+		    'validate' => config_item('imap_cert'),
+	//	    'username' => config_item('imap_user'),
+	//	    'password' => config_item('imap_pass'),
+		    'expunge_on_disconnect' =>  config_item('expunge_on_disconnect'),
+		    'imap_folders' =>  config_item('imap_folders'),
+		    'imap_cache' =>  config_item('imap_cache')
+		);
+
+		if (!empty($newconfig))
+		{
+			$config = array_replace_recursive($baseconfig, $newconfig);
+		}
 
 		if (isset($config['cache']) && $config['cache']['active'] === true)
 		{
-			$this->CI->load->driver('cache',
+			$this->CI->load->driver('cache', // TODO: check if load global one or just for mail
 				[
 				'adapter'    => $config['cache']['adapter'],
 				'backup'     => $config['cache']['backup'],
@@ -96,36 +108,72 @@ class Imap
 				]);
 		}
 
-		$enc = '';
+		$params = '';
 
 		if (isset($config['port']))
 		{
-			$enc .= ':' . $config['port'];
+			$params .= ':' . $config['port'];
 		}
 
-		$enc .= '/imap';
+		$params .= '/imap';
 		if (isset($config['encrypto']))
 		{
-			$enc .= '/' . $config['encrypto'];
+			$params .= '/' . $config['encrypto'];
 		}
 
 		if (isset($config['validate']) && $config['validate'] === false)
 		{
-			$enc .= '/novalidate-cert';
+			$params .= '/novalidate-cert';
 		}
 
-		$options = array();
-		if (isset($config['plain']) && $config['plain'] === TRUE)
+		$this->mailbox = '{' . $config['host'] . $params . '}';
+
+		//$this->_imap_auth = ($this->imap_user == '' AND $this->imap_pass == '') ? FALSE : TRUE;
+
+		// initialize using methods
+		foreach ($config as $key => $val)
 		{
-			$options = array('DISABLE_AUTHENTICATOR' => 'GSSAPI','DISABLE_AUTHENTICATOR' => 'CRAM-MD5');
-		}
+			if (isset($this->$key))
+			{
+				$method = 'set_'.$key;
 
-		if (!isset($config['username']) AND !isset($config['password']))
-		{
-			return FALSE;
+				if (method_exists($this, $method))
+				{
+					$this->$method($val);
+				}
+				else
+				{
+					$this->$key = $val;
+				}
+			}
 		}
+		$this->config = $config;
 
-		$this->mailbox = '{' . $config['host'] . $enc . '}';
+		return $this->config;
+	}
+
+	/**
+	 * [connect description]
+	 *
+	 * @param array $config Options: host, encrypto, user, pass, port, folders
+	 *
+	 * @return boolean True if is connected
+	 */
+	public function connect(array $config = [])
+	{
+		$this->initialize($config);
+
+			$options = array();
+			if (isset($config['plain']) && $config['plain'] === TRUE)
+			{
+				$options = array('DISABLE_AUTHENTICATOR' => 'GSSAPI','DISABLE_AUTHENTICATOR' => 'CRAM-MD5');
+			}
+
+			if (!isset($config['username']) AND !isset($config['password']))
+			{
+				return FALSE;
+			}
+
 		$this->stream  = imap_open($this->mailbox, $config['username'], $config['password'], 0, 0, $options);
 
 		//show_error($this->get_last_error());
@@ -1475,7 +1523,7 @@ class Imap
 	 *
 	 * @return string
 	 */
-	public function getuid(int $msg_number) {
+	public function get_uid(int $msg_number) {
 		$uid = imap_uid ($this->stream, $msg_number);
 		return $uid;
 	}
@@ -1488,7 +1536,7 @@ class Imap
 	 *
 	 * @return array
 	 */
-	public function getuids(string $folder = null, string $flag_criteria = null) {
+	public function get_uids(string $folder = null, string $flag_criteria = null) {
 
 		$total = $this->count_messages($folder, $flag_criteria);
 		$uids = [];
