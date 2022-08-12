@@ -103,9 +103,10 @@ class Imap
 			$enc .= ':' . $config['port'];
 		}
 
+		$enc .= '/imap';
 		if (isset($config['encrypto']))
 		{
-			$enc .= '/imap/' . $config['encrypto'];
+			$enc .= '/' . $config['encrypto'];
 		}
 
 		if (isset($config['validate']) && $config['validate'] === false)
