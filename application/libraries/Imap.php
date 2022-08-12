@@ -212,7 +212,7 @@ class Imap
 	 *
 	 * @return boolean
 	 */
-	public function set_timeout(int $timeout = NULL, string $type = NULL)
+	public function set_timeout($timeout = NULL, $type = NULL)
 	{
 		if($timeout == NULL) $timeout = 60;
 		if($type == NULL) $type = 'open';
@@ -233,7 +233,7 @@ class Imap
 	 *
 	 * @return integer
 	 */
-	public function get_timeout(string $type = NULL)
+	public function get_timeout($type = NULL)
 	{
 		if($type == NULL) $type = 'open';
 		$types = [
@@ -294,7 +294,7 @@ class Imap
 	 *
 	 * @return Imap
 	 */
-	public function set_expunge_on_disconnect(bool $active = NULL)
+	public function set_expunge_on_disconnect($active = NULL)
 	{
 		if ($active == NULL) $active = true;
 		$this->config['expunge_on_disconnect'] = $active;
@@ -400,7 +400,7 @@ class Imap
 	 *
 	 * @return boolean
 	 */
-	public function select_folder(string $folder)
+	public function select_folder($folder)
 	{
 		if ($result = imap_reopen($this->stream, $this->mailbox . $folder))
 		{
@@ -417,7 +417,7 @@ class Imap
 	 *
 	 * @return boolean
 	 */
-	public function add_folder(string $folder_name)
+	public function add_folder($folder_name)
 	{
 		return imap_createmailbox($this->stream, $this->mailbox . $folder_name);
 	}
@@ -430,7 +430,7 @@ class Imap
 	 *
 	 * @return boolean    TRUE on success or FALSE on failure.
 	 */
-	public function rename_folder(string $name, string $new_name)
+	public function rename_folder($name, $new_name)
 	{
 		return imap_renamemailbox($this->stream, $this->mailbox . $name, $this->mailbox . $new_name);
 	}
@@ -442,7 +442,7 @@ class Imap
 	 *
 	 * @return boolean TRUE on success or FALSE on failure.
 	 */
-	public function remove_folder(string $folder_name)
+	public function remove_folder($folder_name)
 	{
 		return imap_deletemailbox($this->stream, $this->mailbox . $folder_name);
 	}
@@ -456,7 +456,7 @@ class Imap
 	 *
 	 * @return integer
 	 */
-	public function count_messages(string $folder = null, string $flag_criteria = null)
+	public function count_messages($folder = null, $flag_criteria = null)
 	{
 		$current_folder = $this->folder;
 
@@ -487,7 +487,7 @@ class Imap
 	 *
 	 * @return array
 	 */
-	public function get_quota(string $folder = null)
+	public function get_quota($folder = null)
 	{
 		$current_folder = $this->folder;
 
@@ -514,7 +514,7 @@ class Imap
 	 *
 	 * @return boolean
 	 */
-	public function move_messages($uids, string $target)
+	public function move_messages($uids, $target)
 	{
 		if (is_array($uids))
 		{
@@ -684,7 +684,7 @@ class Imap
 	 *
 	 * @return boolean
 	 */
-	protected function message_setflag($uids, string $flag)
+	protected function message_setflag($uids, $flag)
 	{
 		if (is_array($uids))
 		{
@@ -702,7 +702,7 @@ class Imap
 	 *
 	 * @return boolean
 	 */
-	protected function message_clearflag($uids, string $flag)
+	protected function message_clearflag($uids, $flag)
 	{
 		if (is_array($uids))
 		{
@@ -775,7 +775,7 @@ class Imap
 	 *
 	 * @return array|boolean False if attachment could not be get
 	 */
-	public function get_attachment(int $uid, int $index = NULL)
+	public function get_attachment($uid, $index = NULL)
 	{
 		if ($index == NULL) $index = 0;
 		$cache_id = $this->folder . ':message_' . $uid . ':attachment_' . $index;
@@ -807,7 +807,7 @@ class Imap
 	 *
 	 * @return array
 	 */
-	public function get_attachments(int $uid, array $indexes = [])
+	public function get_attachments($uid, array $indexes = [])
 	{
 		$attachments = [];
 
@@ -830,7 +830,7 @@ class Imap
 	 *
 	 * @return array
 	 */
-	protected function _get_attachments(int $uid, $structure, string $part_number = NULL,	int $index = null)
+	protected function _get_attachments($uid, $structure, $part_number = NULL, $index = null)
 	{
 		$id          = imap_msgno($this->stream, $uid);
 		$attachments = [];
@@ -907,7 +907,7 @@ class Imap
 	 *
 	 * @return string
 	 */
-	protected function struc_decoding(string $text, int $encoding = NULL)
+	protected function struc_decoding($text, $encoding = NULL)
 	{
 		if ($encoding == NULL) $encoding = 5;
 		switch ($encoding)
@@ -929,7 +929,7 @@ class Imap
 		}
 	}
 
-	protected function get_default_folder(string $type)
+	protected function get_default_folder($type)
 	{
 		foreach ($this->get_folders() as $folder)
 		{
@@ -979,7 +979,7 @@ class Imap
 	 *
 	 * @return array|boolean
 	 */
-	public function get_message(int $uid)
+	public function get_message($uid)
 	{
 		$cache_id = $this->folder . ':message_' . $uid;
 
@@ -1096,7 +1096,7 @@ class Imap
 	 *
 	 * @return string      [description]
 	 */
-	public function get_eml(int $uid)
+	public function get_eml($uid)
 	{
 		$headers = imap_fetchheader($this->stream, $uid, FT_UID | FT_PREFETCHTEXT);
 		$body    = imap_body($this->stream, $uid, FT_UID);
@@ -1104,7 +1104,7 @@ class Imap
 		return $headers . "\n" . $body;
 	}
 
-	public function fun(string $function, ...$params)
+	public function fun(string $function, ...$params) // TODO remove string here? php 7.0 demands forced type params
 	{
 		array_unshift($params, $this->stream);
 
@@ -1239,7 +1239,7 @@ class Imap
 	 *
 	 * @return array Array of uid's matching the search criteria
 	 */
-	public function search(string $search_criteria = NULL, string $sort_by = NULL, bool $descending = NULL)
+	public function search($search_criteria = NULL, $sort_by = NULL, $descending = NULL)
 	{
 		if ($search_criteria == NULL) $search_criteria = 'ALL';
 		if ($sort_by == NULL) $sort_by = 'date';
@@ -1316,7 +1316,7 @@ class Imap
 	 *
 	 * @return array
 	 */
-	public function get_folder_stats(string $folder = null)
+	public function get_folder_stats($folder = null)
 	{
 		$current_folder = $this->folder;
 
@@ -1355,7 +1355,7 @@ class Imap
 	 *
 	 * @return string
 	 */
-	protected function convert_to_utf8(string $str)
+	protected function convert_to_utf8($str)
 	{
 		if (mb_detect_encoding($str, 'UTF-8, ISO-8859-1, GBK') !== 'UTF-8')
 		{
@@ -1422,7 +1422,7 @@ class Imap
 	 *
 	 * @return array
 	 */
-	protected function get_body(int $uid)
+	protected function get_body($uid)
 	{
 		return [
 			'html'  => $this->get_part($uid, 'TEXT/HTML'),
@@ -1440,7 +1440,7 @@ class Imap
 	 *
 	 * @return string
 	 */
-	protected function get_part(int $uid, $mimetype = '', $structure = false, $part_number = '')
+	protected function get_part($uid, $mimetype = '', $structure = false, $part_number = '')
 	{
 		if (! $structure)
 		{
@@ -1523,7 +1523,7 @@ class Imap
 	 *
 	 * @return string
 	 */
-	public function get_uid(int $msg_number) {
+	public function get_uid($msg_number) {
 		$uid = imap_uid ($this->stream, $msg_number);
 		return $uid;
 	}
@@ -1536,7 +1536,7 @@ class Imap
 	 *
 	 * @return array
 	 */
-	public function get_uids(string $folder = null, string $flag_criteria = null) {
+	public function get_uids($folder = null, $flag_criteria = null) {
 
 		$total = $this->count_messages($folder, $flag_criteria);
 		$uids = [];

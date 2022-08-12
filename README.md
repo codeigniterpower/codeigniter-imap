@@ -16,6 +16,7 @@ Comes included with CodeigniterPowered, but for CI 2 or CI3:
 **Requirements**
 
 * Codeigniter 2.x or 3.x
+* php 5.4+ (not tested with php8 but seems work)
 
 **Manual controlled install**
 
