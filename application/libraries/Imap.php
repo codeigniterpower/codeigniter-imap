@@ -119,6 +119,11 @@ class Imap
 			$options = array('DISABLE_AUTHENTICATOR' => 'GSSAPI','DISABLE_AUTHENTICATOR' => 'CRAM-MD5');
 		}
 
+		if (!isset($config['username']) AND !isset($config['password']))
+		{
+			return FALSE;
+		}
+
 		$this->mailbox = '{' . $config['host'] . $enc . '}';
 		$this->stream  = imap_open($this->mailbox, $config['username'], $config['password'], 0, 0, $options);
 
